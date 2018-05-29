@@ -14,7 +14,7 @@ IFstream gradPFile
 if (gradPFile.good())
 {
     gradPFile >> gradP;
-    Info<< "Reading average pressure gradient" <<endl << endl;
+    Info<< "Average pressure gradient at time " << runTime.timeName()<< ": " <<gradP << endl;
 }
 else
 {
