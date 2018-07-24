@@ -32,34 +32,23 @@ int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
     #include "createTime.H"
-    #include "createMesh.H"
+    #include "createMesh.H" // step 1 (set inital value)
     #include "readTransportProperties.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
     //#include "readTimeControls.H" // for fixed courant number
     #include "createGradP.H"
 
+    // define owner to neighbour unit-vector "ed" and gradpDiff_f fields
+    #include "RhieChow.H"
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
-    //Rhie Chow interpolation stuff
-    const surfaceVectorField ed = mesh.delta()()/mag(mesh.delta()());
-    Foam::fv::orthogonalSnGrad<scalar> faceGradient(mesh);
-
-    //surfaceVectorField gradp_avg_f = linearInterpolate(fvc::grad(p));
-    surfaceVectorField gradpDiff_f
-        =
-        -(linearInterpolate(fvc::grad(p)) & ed)*ed
-        + (faceGradient.snGrad(p))*ed;
-
-    // adding gradU for open-boundary pressure estimation
-    volTensorField gradU("gradU", fvc::grad(U));
-
     // run-time coverge and advance loop
     while (runTime.loop())
     {
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.timeName() << endl;
 
         #include "readPISOControls.H"
         #include "CourantNo.H"
@@ -80,25 +69,24 @@ int main(int argc, char *argv[])
             for (int nPrime=1; nPrime <= nPrimeIterations; nPrime++)
             {
                 #include "PRIME.H"
-
-                // calculate gradP and update velocity field (at the end of convergence)
-                if(nPrime == nPrimeIterations && corr == nCorr)
-                {
-                    #include "calculateGradP.H"
-                }
             }
             // end of PRIME loop
 
+
+            if(corr == nCorr)
+            {
+                // estimate continuty error
+                #include "continuityErrs.H"
+
+                // calculate gradP and update velocity field (at the end of convergence)
+                #include "calculateGradP.H"
+            }
+
         }// end of corrector loop
 
-        #include "continuityErrs.H"
-
+        // update turbulence and nuEff
         turbulence->correct();
-
-        // update nuEff
         nuEff = turbulence->nuEff();
-
-        gradU = fvc::grad(U);
 
         runTime.write();
         #include "writeGradP.H"

@@ -6,11 +6,13 @@ fvVectorMatrix UEqn
   + fvm::div(phi, U)
   + turbulence->divDevReff(U)
   + fvm::SuSp(-fvc::div(phi),U)
-  + flowDirection*gradP // driving pressure gradient
 );
 
 //- Momentum solution adding the pressure gradient as a source term
 solve
 (
-    UEqn == -fvc::grad(p)
+    UEqn == (
+             - fvc::grad(p)
+             - flowDirection*gradP // driving pressure gradient
+             )
 );

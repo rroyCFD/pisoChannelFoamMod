@@ -29,6 +29,6 @@ dimensionedScalar magUbar = mag(Ubar);
 vector flowDirection = (Ubar/magUbar).value();
 
 scalar alpha(transportProperties.lookupOrDefault("alpha", 1.0));
-Info << "Incremental pressure gradient damping coefficinet (alpha): "
+Info << "Incremental pressure gradient damping coefficient (alpha): "
     << alpha << endl;
 // ************************************************************************* //
