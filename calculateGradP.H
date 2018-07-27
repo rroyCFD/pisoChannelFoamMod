@@ -14,8 +14,7 @@
     U.correctBoundaryConditions();
 
     //update phi as well
-    // phi += (fvc::interpolate((flowDirection*rAU*pDelta)) & mesh.Sf());
-    phi += rAUf * ((flowDirection * pDelta) & mesh.Sf());
+    // phi += rAUf * ((flowDirection * pDelta) & mesh.Sf());
 
     // update driving pressure gradient to maintain mass & momentum flux
     gradP -= pDelta;

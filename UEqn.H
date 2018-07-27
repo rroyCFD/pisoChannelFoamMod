@@ -5,7 +5,7 @@ fvVectorMatrix UEqn
     fvm::ddt(U)
   + fvm::div(phi, U)
   + turbulence->divDevReff(U)
-  + fvm::SuSp(-fvc::div(phi),U)
+  //+ fvm::SuSp(-fvc::div(phi),U)
 );
 
 //- Momentum solution adding the pressure gradient as a source term
