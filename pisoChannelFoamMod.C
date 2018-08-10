@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     #include "readTransportProperties.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
-    //#include "readTimeControls.H" // for fixed courant number
+    #include "readTimeControls.H" // for fixed courant number
     #include "createGradP.H"
 
     // define owner to neighbour unit-vector "ed" and gradpDiff_f fields
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
         #include "readPISOControls.H"
         #include "CourantNo.H"
-        //#include "setDeltaT.H" // for fixed courant number, variable timeStep
+        #include "setDeltaT.H" // for fixed courant number, variable timeStep
 
         // store old values for temporal discretization,
         // & temporal correction to phi in Rhie-Chow flux calculation.
