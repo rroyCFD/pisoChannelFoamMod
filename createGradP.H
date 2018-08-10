@@ -1,3 +1,18 @@
+//  Read centerline velocity for channel simulations
+dimensionedVector Ubar
+(
+    transportProperties.lookup("Ubar")
+);
+Info << "Mean Velocity: " << Ubar << endl;
+
+dimensionedScalar magUbar = mag(Ubar);
+vector flowDirection = (Ubar/magUbar).value();
+
+scalar alpha(transportProperties.lookupOrDefault("alpha", 1.0));
+Info << "Incremental pressure gradient damping coefficient (alpha): "
+    << alpha << endl;
+
+//-----------------------------------------------------------------------------------------//
 dimensionedScalar gradP
 (
     "gradP",
