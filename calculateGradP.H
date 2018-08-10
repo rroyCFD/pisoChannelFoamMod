@@ -5,8 +5,8 @@
 
     // Calculate the pressure gradient increment needed to
     // adjust the average flow-rate to the correct value
-    // damping pDelta by alpha (tends to dampen ocilation in gradP)
-    dimensionedScalar pDelta = alpha * (magUbar - magUbarStar)/rAU.weightedAverage(mesh.V());
+    // damping pDelta by relaxation (tends to dampen ocilation in gradP)
+    dimensionedScalar pDelta = relaxation * (magUbar - magUbarStar)/rAU.weightedAverage(mesh.V());
 
     // update velocity field for incremental pressure-gradient
     // rAU & rAUf declared at ppEqn and updated in the PRIME loop
@@ -23,6 +23,6 @@
     Info<< "Uncorrected Ubar = " << magUbarStar.value() << tab
         << "pressure gradient = " << gradP.value() << tab
         << "incremental pressure gradient= " << pDelta.value() << tab
-        << "damping coeffs: "<< alpha
+        << "damping coeffs: "<< relaxation
         << endl;
 }
