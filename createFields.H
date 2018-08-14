@@ -15,6 +15,16 @@
     const volScalarField::GeometricBoundaryField& pbf = p.boundaryField();
     wordList pbt = pbf.types();
 
+    // prepare the boundary condition types for pressure-correction field
+    wordList ppbt = pbt;
+    forAll(ppbt, b)
+    {
+        if(ppbt[b] == "timeVaryingMappedFixedValue")
+        {
+            ppbt[b] = "fixedValue";
+        }
+    }
+
     volScalarField pp
     (
         IOobject
@@ -28,9 +38,8 @@
         ),
         mesh,
         dimensionedScalar("zero", p.dimensions(), 0.0),
-        pbt
+        ppbt
     );
-
 
     // Set pp boundary values
     forAll(pp.boundaryField(), patchi)
