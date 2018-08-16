@@ -26,7 +26,7 @@
 
         scalar refCellValue = getRefCellValue(p, pRefCell);
 
-        if(mag(pRefValue -refCellValue) > SMALL)
+        if(mag(pRefValue -refCellValue) > VSMALL)
         {
             Info << "Un-corrected pressure at pRefCell: " << refCellValue << endl;
             p.internalField() += (pRefValue -refCellValue);
