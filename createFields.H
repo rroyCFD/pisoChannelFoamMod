@@ -19,27 +19,43 @@
 
     if(pRefOn)
     {
-        Info <<" pRefOn: " << pRefOn
-            << " pRefCell: "<< pRefCell
-            << " pRefValue: "<< pRefValue
-            << endl;
+        Info <<"pRefOn: " << pRefOn << " pRefCell: "<< pRefCell << " pRefValue: "<< pRefValue  << endl;
 
-        scalar refCellValue = getRefCellValue(p, pRefCell);
+        // const label nProcs_ =Pstream::nProcs();
+        // getRefCellValue does not work accurately in parallel! needed to divide by nProcs to match with p[pRefCell]
+        // scalar refCellValue = getRefCellValue(p, pRefCell)/nProcs_;
+        // scalar refCellValue = p[pRefCell]; // works!
 
-        if(mag(pRefValue -refCellValue) > VSMALL)
+        if(mag(pRefValue -p[pRefCell]) > VSMALL)
         {
-            Info << "Un-corrected pressure at pRefCell: " << refCellValue << endl;
-            p.internalField() += (pRefValue -refCellValue);
-            // boundary values are updated in the  *.C file
-            Info << "Corrected    pressure at pRefCell: " << getRefCellValue(p, pRefCell) << endl;
-        }
+            if(Pstream::master())
+            {
+                Pout << "Un-corrected pressure at pRefCell: " << p[pRefCell] << endl;
+            }
+            // updates the pressure field such that prescribed refValue is achieved at refCell
+            // Only linear translate the field, not the pressure gradient
+            // shall not affect case with Dirichlet pressure boundary,
+            // because pressure reference is not required then
+
+            p += (pRefValue -p[pRefCell])*dimensionedScalar("unitPressure", p.dimensions(), 1.0);
+
+            if(Pstream::master())
+            {
+                Pout << "Corrected    pressure at pRefCell: " << p[pRefCell] << endl;
+            }
+
+        } // end of pressurecorrection loop
+
+        Info << "writing corrected pressure field" << endl;
+        p.correctBoundaryConditions();
+        p.write();
     }
 
+    // If the field fieldRef needs referencing find the reference cell nearest.
     setRefCell(p, pisoDict, pRefCell, pRefValue);
 
-
     //-----------------------------------------------------------------------------------------//
-    Info << "Creating pressure-coorection field pp" << endl;
+    Info << "\nCreating pressure-coorection field pp" << endl;
     const volScalarField::GeometricBoundaryField& pbf = p.boundaryField();
     wordList pbt = pbf.types();
 
@@ -109,7 +125,7 @@
 
 
     //-----------------------------------------------------------------------------------------//
-    Info<< "Creating field nuEff" << endl;
+    Info<< "\nCreating field nuEff" << endl;
     volScalarField nuEff
     (
         IOobject

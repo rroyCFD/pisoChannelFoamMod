@@ -84,6 +84,11 @@ int main(int argc, char *argv[])
 
         }// end of corrector loop
 
+        if(pRefOn)
+        {
+            Info << "pressure at reference cell: " << p[pRefCell] << endl;
+        }
+
         // update turbulence and nuEff
         turbulence->correct();
         nuEff = turbulence->nuEff();
